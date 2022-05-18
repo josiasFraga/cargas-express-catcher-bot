@@ -40,7 +40,7 @@ const main = async () => {
                     }
                 }
 
-                const now = moment().format('YYYY-MM-DD HH:mm:ss');
+                const now = moment().tz("America/Sao_Paulo").format('YYYY-MM-DD HH:mm:ss');
                 console.log(now + ' retorno encontrado, inserindo no banco de dados');
                 salva_dados = await db.insertData({created: now, dados: JSON.stringify(textFormatado)});
                 if ( salva_dados ) {
@@ -49,7 +49,6 @@ const main = async () => {
                 //fs.writeFileSync('retorno_ok - ' + moment().format('YYYY_MM_DD__HH_mm_ss') + '.json', JSON.stringify(textFormatado));
             }
         }
-        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
     });
 
 	await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15');
@@ -77,13 +76,13 @@ const main = async () => {
         var entrar = document.evaluate(xpathentrar, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         entrar.click();
     });
-    console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
+    console.log(moment().tz("America/Sao_Paulo").format('YYYY-MM-DD HH:mm:ss'));
     console.log('Fim');
 }
 
 setInterval(async function() {
-    now = moment().format('YYYY-MM-DD HH:mm:ss');
-    now_custom = moment().format('HH:mm');
+    now = moment().tz("America/Sao_Paulo").format('YYYY-MM-DD HH:mm:ss');
+    now_custom = moment().tz("America/Sao_Paulo").format('HH:mm');
     console.log(now);
     console.log(now_custom);
     console.log(START_SCRIPT_AT);
