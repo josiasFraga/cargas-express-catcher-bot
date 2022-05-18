@@ -80,6 +80,8 @@ const main = async () => {
     console.log('Fim');
 }
 
+main();
+
 setInterval(async function() {
     now = moment().tz("America/Sao_Paulo").format('YYYY-MM-DD HH:mm:ss');
     now_custom = moment().tz("America/Sao_Paulo").format('HH:mm');
@@ -95,5 +97,5 @@ setInterval(async function() {
     if ( now_custom == STOP_SCRIPT_AT) {
         process.exit(200)
     }
-},31000);
+},60000);
 
