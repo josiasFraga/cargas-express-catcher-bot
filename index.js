@@ -1,6 +1,11 @@
 const puppeteer = require('puppeteer');
 const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
 const fs = require('fs');
+const moment = require('moment-timezone');
+moment.locale('pt-br');
+const db = require('./db');
+const START_SCRIPT_AT = process.env.START_SCRIPT_AT;
+const STOP_SCRIPT_AT = process.env.STOP_SCRIPT_AT;
 
 const main = async () => {
 	console.log('iniciando')
@@ -18,7 +23,7 @@ const main = async () => {
             '--disable-gpu'
         ],	
 	    defaultViewport: null,
-        headless: false
+        headless: true
     });
 
 	const [page] = await browser.pages();
@@ -34,9 +39,17 @@ const main = async () => {
                         textFormatado.push(hit._source);
                     }
                 }
-                fs.writeFileSync('retorno_ok.json', JSON.stringify(textFormatado));
+
+                const now = moment().format('YYYY-MM-DD HH:mm:ss');
+                console.log(now + ' retorno encontrado, inserindo no banco de dados');
+                salva_dados = await db.insertData({created: now, dados: JSON.stringify(textFormatado)});
+                if ( salva_dados ) {
+                    console.log(now + ' salvo com sucesso no banco de dados');
+                }
+                //fs.writeFileSync('retorno_ok - ' + moment().format('YYYY_MM_DD__HH_mm_ss') + '.json', JSON.stringify(textFormatado));
             }
         }
+        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
     });
 
 	await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15');
@@ -57,14 +70,31 @@ const main = async () => {
     await snooze(2000);
 
     await page.keyboard.type('070914')
-    
     await snooze(3000);
 
     await page.evaluate(async () => {
         var xpathentrar = "//button[text()='ENTRAR']";
         var entrar = document.evaluate(xpathentrar, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         entrar.click();
-    });   
+    });
+    console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
+    console.log('Fim');
 }
 
-main();
+setInterval(async function() {
+    now = moment().format('YYYY-MM-DD HH:mm:ss');
+    now_custom = moment().format('HH:mm');
+    console.log(now);
+    console.log(now_custom);
+    console.log(START_SCRIPT_AT);
+    console.log(STOP_SCRIPT_AT);
+
+    if ( now_custom == START_SCRIPT_AT) {
+        main();
+    }
+
+    if ( now_custom == STOP_SCRIPT_AT) {
+        process.exit(200)
+    }
+},31000);
+
